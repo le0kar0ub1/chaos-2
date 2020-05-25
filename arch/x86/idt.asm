@@ -23,11 +23,21 @@ isr:
 	%if i == 8 || (i >= 10 && i <= 14) || i == 17
 		nop	; Two nops have the same length as a pushl
 		nop
-		push dword i
+		; Ensure all gates have the same size
+		DB 0x68
+    	DB i
+    	DB 0
+    	DB 0
+    	DB 0
 		jmp interrupt_common
 	%else
 		push dword 0	; Fake error code
-		push dword i
+		; Ensure all gates have the same size
+		DB 0x68
+    	DB i
+    	DB 0
+    	DB 0
+    	DB 0
 		jmp interrupt_common
 	%endif
 	%assign i (i + 1)
@@ -108,7 +118,7 @@ idt_setup:
 	shr ebx, 16
 	mov word [edi + 6], bx
 
-	add esi, 9 ; Size of an isr (pushb + pushb + jmp) - See above
+	add esi, 12 ; Size of an isr (pushb + pushb + jmp) - See above
 	add edi, 8
 
 	loop .loop
